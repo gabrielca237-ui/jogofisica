@@ -1,6 +1,6 @@
 # Newton GP
 
-Corrida 3D com quiz de física (F = m · a). Responda na largada, em câmera lenta, e ganhe vantagem na corrida.
+Corrida 3D com física de verdade (F = m · a). Antes da largada você escolhe 1 entre 3 carros com massa e aceleração diferentes: mais massa empurra os rivais mas acelera menos, e muita força com muita massa fica difícil de controlar. Itens como o Bloco de Aço (massa ×2,5) e a Pluma (massa ×0,6) mudam a massa durante a corrida.
 
 **Jogar:** https://gabrielca237-ui.github.io/jogofisica/
 

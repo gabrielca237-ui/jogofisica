@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="theme-color" content="#070b18">
 <title>Newton GP | Corrida de física</title>
-<meta name="description" content="Jogo de corrida 3D com quiz de física: escolha o setup certo usando F = m · a e vença os rivais.">
+<meta name="description" content="Jogo de corrida 3D com física: escolha o carro certo usando F = m · a e vença os rivais.">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -31,7 +31,7 @@
     <div class="title-left">
       <div class="eyebrow">CORRIDA 3D · FÍSICA DE VERDADE</div>
       <h1 class="logo huge"><span>NEWTON</span><em>GP</em></h1>
-      <p class="lead">Escolha o carro, resolva o desafio na largada e use <b>F = m · a</b> para vencer a pista.</p>
+      <p class="lead">Escolha o carro certo na largada e use <b>F = m · a</b> para vencer a pista.</p>
       <button class="play" id="btn-play"><span class="play-icon" aria-hidden="true"></span><span>CLIQUE PARA JOGAR</span></button>
       <div class="hint">ou pressione <kbd>Enter</kbd></div>
     </div>
@@ -142,6 +142,7 @@
         <span class="tag" id="q-topic"></span>
         <span class="lvl" id="q-lvl"></span>
         <div class="timer" id="q-timerwrap"><i id="q-timer"></i><b id="q-secs">25</b></div>
+        <button class="ghost" id="q-back" hidden>← Voltar</button>
       </header>
       <h2 id="q-title"></h2>
       <p id="q-text"></p>
@@ -225,9 +226,9 @@
         <div>
           <h3>Como funciona</h3>
           <ol class="steps-list">
-            <li><b>Quiz na largada.</b> Antes de largar, o tempo fica lento e você resolve um desafio de <b>F = m · a</b>. Acertar melhora o seu carro; errar piora.</li>
+            <li><b>Escolha o carro na largada.</b> Você vê 3 carros com massa e aceleração diferentes (<b>a = F ÷ m</b>). Mais massa empurra os rivais, mas acelera menos; muita força com muita massa fica difícil de controlar. Escolha o melhor para a pista.</li>
             <li><b>Corrida contra rivais.</b> Eles disputam entre si, se ultrapassam, batem e usam itens como você.</li>
-            <li><b>Caixas “?”.</b> Dão Nitro, Escudo, Espinhos, Óleo, Míssil ou Bloco de Aço.</li>
+            <li><b>Caixas “?”.</b> Dão Nitro, Escudo, Espinhos, Óleo, Míssil, Bloco de Aço (massa ×2,5) ou Pluma (massa ×0,6).</li>
             <li><b>Física ao vivo.</b> O painel mostra força, massa e aceleração do seu carro mudando em tempo real.</li>
           </ol>
         </div>
