@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#070b18">
+<title>Newton GP | Corrida de física</title>
+<meta name="description" content="Jogo de corrida 3D com quiz de física: escolha o setup certo usando F = m · a e vença os rivais.">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="gl" aria-label="Cena 3D do jogo"></canvas>
+<canvas id="lines" aria-hidden="true"></canvas>
+<div id="vignette" aria-hidden="true"></div>
+<div class="bar-top" aria-hidden="true"></div><div class="bar-bot" aria-hidden="true"></div>
+
+<div id="app">
+  <!-- carregando -->
+  <section class="screen" id="s-boot">
+    <div class="boot-box">
+      <div class="logo big"><span>NEWTON</span><em>GP</em></div>
+      <div class="bar"><i id="boot-bar"></i></div>
+      <p id="boot-text">Carregando…</p>
+      <p id="boot-tip" class="tip"></p>
+    </div>
+  </section>
+
+  <!-- título -->
+  <section class="screen" id="s-title" hidden>
+    <div class="title-left">
+      <div class="eyebrow">CORRIDA 3D · FÍSICA DE VERDADE</div>
+      <h1 class="logo huge"><span>NEWTON</span><em>GP</em></h1>
+      <p class="lead">Escolha o carro, resolva o desafio na largada e use <b>F = m · a</b> para vencer a pista.</p>
+      <button class="play" id="btn-play"><span class="play-icon" aria-hidden="true"></span><span>CLIQUE PARA JOGAR</span></button>
+      <div class="hint">ou pressione <kbd>Enter</kbd></div>
+    </div>
+    <div class="title-tools">
+      <button class="icon-btn" id="btn-lab" title="Laboratório de física"><svg viewBox="0 0 24 24"><path d="M9 3h6v2l-1 1v4.6l5.2 8.7A2 2 0 0 1 17.5 22h-11a2 2 0 0 1-1.7-2.7L10 10.6V6L9 5V3z"/><path d="M7.5 16h9"/></svg><span>Laboratório</span></button>
+      <button class="icon-btn" id="btn-howto" title="Como jogar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1 1-1.1 1.8M12 17h.01"/></svg><span>Como jogar</span></button>
+      <button class="icon-btn" id="btn-settings" title="Configurações"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ajustes</span></button>
+      <button class="icon-btn" id="btn-credits" title="Créditos"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c.8-3.6 3.6-5.4 7-5.4s6.2 1.800 7 5.400"/></svg><span>Créditos</span></button>
+      <button class="icon-btn" id="btn-mute" title="Som"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path id="mute-wave" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg><span>Som</span></button>
+    </div>
+    <div class="statline" id="statline"></div>
+    <footer class="credits"><span>Criado por</span> <b>Sandro T</b> <i>·</i> <b>Gabriel CA</b> <i>·</i> <b>Vitor LC</b></footer>
+  </section>
+
+  <!-- garagem -->
+  <section class="screen" id="s-garage" hidden>
+    <header class="top">
+      <button class="back" data-back="title">← Voltar</button>
+      <div class="steps"><b class="on">1 Carro</b><i></i><b>2 Pista</b><i></i><b>3 Corrida</b></div>
+      <div></div>
+    </header>
+    <div class="garage-left" id="car-list"></div>
+    <button class="nav-arrow left" id="car-prev" aria-label="Carro anterior">‹</button>
+    <button class="nav-arrow right" id="car-next" aria-label="Próximo carro">›</button>
+    <div class="garage-name">
+      <div class="cls" id="car-cls"></div>
+      <h2 id="car-name"></h2>
+      <p id="car-blurb"></p>
+    </div>
+    <aside class="panel specs" id="car-specs"></aside>
+    <footer class="bottom"><button class="primary" id="btn-garage-next">Escolher pista →</button></footer>
+  </section>
+
+  <!-- pistas -->
+  <section class="screen" id="s-tracks" hidden>
+    <header class="top">
+      <button class="back" data-back="garage">← Voltar</button>
+      <div class="steps"><b class="done">1 Carro</b><i></i><b class="on">2 Pista</b><i></i><b>3 Corrida</b></div>
+      <div></div>
+    </header>
+    <div class="tracks-wrap">
+      <h2 class="screen-title">Escolha a pista</h2>
+      <div class="track-grid" id="track-grid"></div>
+      <div class="track-info" id="track-info"></div>
+      <div class="options-row">
+        <div class="seg-group"><label>Rivais</label><div class="seg" id="seg-diff"></div></div>
+        <div class="seg-group"><label>Voltas</label><div class="seg" id="seg-laps"></div></div>
+      </div>
+    </div>
+    <footer class="bottom"><button class="primary big" id="btn-race">CORRER →</button></footer>
+  </section>
+
+  <!-- HUD da corrida -->
+  <section id="hud" hidden>
+    <div class="hud-tl">
+      <div class="pos"><span id="h-pos">1</span><small>/<span id="h-total">6</span></small></div>
+      <div class="lap">VOLTA <b id="h-lap">1</b><span>/<span id="h-laps">3</span></span></div>
+    </div>
+    <div class="hud-draft" id="h-draft">VÁCUO · menos resistência do ar</div>
+    <div class="hud-tc">
+      <div class="time" id="h-time">00:00.00</div>
+      <div class="best" id="h-best">MELHOR VOLTA --:--.--</div>
+    </div>
+    <div class="hud-tr">
+      <canvas id="h-map" width="260" height="200"></canvas>
+      <ol id="h-board"></ol>
+    </div>
+    <div class="hud-bl" id="h-phys">
+      <div class="phys-title">FÍSICA AO VIVO <span id="h-buff"></span></div>
+      <div class="phys-row"><b>F</b><i><u id="h-fbar"></u></i><span id="h-f">0 N</span></div>
+      <div class="phys-row"><b>m</b><i><u id="h-mbar"></u></i><span id="h-m">0 kg</span></div>
+      <div class="phys-row acc"><b>a</b><i><u id="h-abar"></u></i><span id="h-a">0 m/s²</span></div>
+      <div class="phys-eq" id="h-eq">a = F ÷ m</div>
+      <div class="phys-chips" id="h-chips"></div>
+    </div>
+    <div class="hud-br">
+      <svg viewBox="0 0 260 200" class="gauge">
+        <path class="g-bg" d="M 36 168 A 100 100 0 1 1 224 168" pathLength="100"/>
+        <path class="g-fill" id="g-fill" d="M 36 168 A 100 100 0 1 1 224 168" pathLength="100"/>
+        <path class="g-nitro" id="g-nitro" d="M 52 162 A 84 84 0 1 1 208 162" pathLength="100"/>
+      </svg>
+      <div class="speed"><b id="h-speed">0</b><small>km/h</small></div>
+      <div class="gear" id="h-gear">1</div>
+      <div class="surf" id="h-surf"><span id="h-surf-n">ASFALTO</span> <b id="h-surf-mu">μ 1,00</b></div>
+    </div>
+    <div class="hud-bc">
+      <div class="item" id="h-item"><div class="item-ic" id="h-item-ic"></div><div class="item-tx"><b id="h-item-name">SEM ITEM</b><small id="h-item-key">Passe pelas caixas ?</small></div><kbd>Espaço</kbd></div>
+      <div class="drift-bar" id="h-drift"><i></i></div>
+    </div>
+    <div id="h-toast"></div>
+    <div id="h-count"></div>
+    <div id="h-hint"></div>
+    <div id="h-wrong">SENTIDO ERRADO</div>
+    <button class="pause-btn" id="btn-pause" title="Pausar (Esc)"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button>
+    <div id="touch" hidden>
+      <div class="t-left"><button data-k="left">‹</button><button data-k="right">›</button></div>
+      <div class="t-right"><button data-k="brake">FREIO</button><button data-k="accel" class="gas">ACEL</button><button data-k="drift">DRIFT</button><button data-k="item" class="itm">ITEM</button></div>
+    </div>
+  </section>
+
+  <div id="h-skip">Pressione qualquer tecla para pular</div>
+
+  <!-- quiz -->
+  <section id="quiz" hidden>
+    <div class="quiz-card">
+      <header>
+        <span class="chip" id="q-chip">LARGADA EM CÂMERA LENTA</span>
+        <span class="tag" id="q-topic"></span>
+        <span class="lvl" id="q-lvl"></span>
+        <div class="timer" id="q-timerwrap"><i id="q-timer"></i><b id="q-secs">25</b></div>
+      </header>
+      <h2 id="q-title"></h2>
+      <p id="q-text"></p>
+      <div class="hintrow"><button class="ghost" id="q-hint">Ver fórmula</button><span id="q-formula" hidden></span></div>
+      <div class="options" id="q-options"></div>
+      <div id="q-result" hidden>
+        <div class="verdict" id="q-verdict"></div>
+        <ul class="explain" id="q-explain"></ul>
+        <div class="effect" id="q-effect"></div>
+        <div class="quiz-actions"><button class="primary" id="q-go">LARGAR!</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- resultados -->
+  <section id="results" hidden>
+    <div class="res-card">
+      <div class="eyebrow">BANDEIRADA</div>
+      <h2 id="r-title">Você terminou em 1º</h2>
+      <div class="res-grid">
+        <table class="board" id="r-table"></table>
+        <div class="res-side">
+          <div class="stat"><small>TEMPO TOTAL</small><b id="r-time">--</b></div>
+          <div class="stat"><small>MELHOR VOLTA</small><b id="r-best">--</b></div>
+          <div class="stat"><small>VELOCIDADE MÁXIMA</small><b id="r-vmax">--</b></div>
+          <div class="lesson" id="r-lesson"></div>
+        </div>
+      </div>
+      <div class="res-actions"><button class="primary" id="r-again">Correr de novo</button><button class="ghost" id="r-tracks">Outra pista</button><button class="ghost" id="r-menu">Menu</button></div>
+    </div>
+  </section>
+
+  <!-- pausa -->
+  <section id="pause" class="modal" hidden>
+    <div class="modal-card small">
+      <h2>Pausado</h2>
+      <button class="primary" id="p-resume">Continuar</button>
+      <button class="ghost" id="p-restart">Reiniciar corrida</button>
+      <button class="ghost" id="p-settings">Ajustes</button>
+      <button class="ghost" id="p-quit">Sair para o menu</button>
+    </div>
+  </section>
+
+  <!-- ajustes -->
+  <section id="settings" class="modal" hidden>
+    <div class="modal-card">
+      <h2>Ajustes</h2>
+      <label class="row">Qualidade gráfica
+        <select id="set-quality"><option value="auto">Automática</option><option value="high">Alta</option><option value="medium">Média</option><option value="low">Baixa (computadores simples)</option></select>
+      </label>
+      <label class="row">Volume geral <input type="range" id="set-vol" min="0" max="100"></label>
+      <label class="row">Música <input type="range" id="set-music" min="0" max="100"></label>
+      <label class="row">Efeitos <input type="range" id="set-sfx" min="0" max="100"></label>
+      <label class="row check">Tremor de câmera <input type="checkbox" id="set-shake"></label>
+      <label class="row check">Mostrar FPS <input type="checkbox" id="set-fps"></label>
+      <label class="row">Tela cheia (tecla F) <button class="ghost" id="set-full" type="button">Alternar</button></label>
+      <p class="muted" id="set-info"></p>
+      <button class="primary" id="set-close">Fechar</button>
+    </div>
+  </section>
+
+  <!-- como jogar -->
+  <section id="howto" class="modal" hidden>
+    <div class="modal-card wide">
+      <h2>Como jogar</h2>
+      <div class="how-grid">
+        <div>
+          <h3>Controles</h3>
+          <div class="keys">
+            <div><span class="kk"><kbd>W</kbd><kbd>↑</kbd></span><span>Acelerar</span></div>
+            <div><span class="kk"><kbd>S</kbd><kbd>↓</kbd></span><span>Frear / ré</span></div>
+            <div><span class="kk"><kbd>A</kbd><kbd>D</kbd><kbd>←</kbd><kbd>→</kbd></span><span>Virar</span></div>
+            <div><span class="kk"><kbd>Shift</kbd></span><span>Derrapar (solte para ganhar mini-turbo)</span></div>
+            <div><span class="kk"><kbd>Espaço</kbd></span><span>Usar item</span></div>
+            <div><span class="kk"><kbd>C</kbd></span><span>Trocar câmera</span></div>
+            <div><span class="kk"><kbd>R</kbd></span><span>Voltar para a pista</span></div>
+            <div><span class="kk"><kbd>Esc</kbd></span><span>Pausar</span></div>
+          </div>
+          <p class="muted">Também funciona com controle (gamepad) e com os botões na tela do celular.</p>
+        </div>
+        <div>
+          <h3>Como funciona</h3>
+          <ol class="steps-list">
+            <li><b>Quiz na largada.</b> Antes de largar, o tempo fica lento e você resolve um desafio de <b>F = m · a</b>. Acertar melhora o seu carro; errar piora.</li>
+            <li><b>Corrida contra rivais.</b> Eles disputam entre si, se ultrapassam, batem e usam itens como você.</li>
+            <li><b>Caixas “?”.</b> Dão Nitro, Escudo, Espinhos, Óleo, Míssil ou Bloco de Aço.</li>
+            <li><b>Física ao vivo.</b> O painel mostra força, massa e aceleração do seu carro mudando em tempo real.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="item-legend" id="item-legend"></div>
+      <button class="primary" id="how-close">Entendi</button>
+    </div>
+  </section>
+
+  <!-- créditos -->
+  <section id="creditsModal" class="modal" hidden>
+    <div class="modal-card wide">
+      <h2>Créditos</h2>
+      <div class="how-grid">
+        <div>
+          <h3>Desenvolvimento</h3>
+          <p class="cred-names"><b>Sandro T</b><b>Gabriel CA</b><b>Vitor LC</b></p>
+          <h3>Tecnologia</h3>
+          <p class="muted">Three.js (MIT), áudio sintetizado com Web Audio, fontes Barlow e Barlow Condensed (SIL OFL). O jogo funciona sem internet.</p>
+        </div>
+        <div>
+          <h3>Modelos 3D de carros (Sketchfab)</h3>
+          <ul class="cred-list">
+            <li>Nissan Skyline R34 GT-R: Lexyc16, CC BY 4.0</li>
+            <li>Toyota Supra MK4 (low poly): Mike Farrant, CC BY 4.0</li>
+            <li>Mazda RX-7: danok98, CC BY 4.0</li>
+            <li>1990 Mazda Miata NA: Ricy, CC BY 4.0</li>
+            <li>BMW M3 E46: Lexyc16, CC BY-NC 4.0 (uso não comercial)</li>
+          </ul>
+          <p class="muted">Os modelos foram otimizados para este jogo (menos polígonos, rodas separadas, texturas menores). Marcas e nomes pertencem aos seus titulares; os autores não endossam este projeto.</p>
+        </div>
+      </div>
+      <button class="primary" id="cred-close">Fechar</button>
+    </div>
+  </section>
+
+  <!-- pausa de arranque: fim de jogo / erro -->
+  <section id="fatal" class="modal" hidden>
+    <div class="modal-card small"><h2>Não foi possível iniciar o 3D</h2><p id="fatal-msg">Seu navegador não conseguiu criar o contexto WebGL. Tente atualizar o navegador e ativar a aceleração por hardware.</p><button class="primary" onclick="location.reload()">Tentar de novo</button></div>
+  </section>
+</div>
+<div id="rotate" aria-hidden="true"><div><svg viewBox="0 0 64 64"><rect x="18" y="6" width="28" height="52" rx="5" fill="none" stroke="#35d6ff" stroke-width="3"/><path d="M52 28a22 22 0 0 0-8-12M12 36a22 22 0 0 0 8 12" fill="none" stroke="#ff4fa3" stroke-width="3" stroke-linecap="round"/></svg><b>Gire o aparelho</b><span>O jogo funciona melhor na horizontal.</span></div></div>
+<div id="fps" hidden></div>
+<script src="game.js"></script>
+</body>
+</html>
