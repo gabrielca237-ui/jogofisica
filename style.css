@@ -248,6 +248,7 @@ b{font-weight:600}
 .opt:disabled{cursor:default}
 .options.three{grid-template-columns:repeat(3,1fr)}
 .opt em{font-style:normal;color:#fff;font-weight:600}
+.opt .launch{margin-top:.15rem;padding-top:.25rem;border-top:1px solid var(--line);color:#dbe5ff}.opt .launch.spin,.opt .launch.spin em{color:var(--red)}
 .opt .obar{display:flex;align-items:center;justify-content:space-between;gap:.4rem;font-size:.9rem;color:var(--muted)}.options.picked .opt{min-height:0}.options.picked .opt svg,.options.picked .opt .obar{display:none}
 .mini{display:inline-block;flex:0 0 3.4rem;height:.4rem;background:rgba(255,255,255,.14)}.mini i{display:block;height:100%;background:var(--cyan)}
 .opt.on{border-color:var(--cyan);background:rgba(53,214,255,.2);box-shadow:0 0 1.4rem rgba(53,214,255,.3)}.options.picked .opt:not(.on){opacity:.5}
